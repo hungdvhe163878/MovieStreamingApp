@@ -1,5 +1,0 @@
-<resources>
-    <string name="app_name">Movie Streaming App</string>
-    <string name="title_activity_home">activity_home</string>
-    <string name="slider_content_description">slider content description</string>
-</resources>
