@@ -54,6 +54,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("androidx.constraintlayout:constraintlayout:2.2.0-alpha13")
+    implementation ("com.github.smarteist:autoimageslider:1.4.0-appcompat")
     // To use constraintlayout in compose
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha13")
     implementation ("androidx.recyclerview:recyclerview:1.2.1")

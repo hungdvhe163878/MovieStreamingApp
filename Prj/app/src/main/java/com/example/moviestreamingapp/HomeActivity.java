@@ -39,7 +39,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         searchEditText = findViewById(R.id.searchView);
-        moviesRecyclerView = findViewById(R.id.movies_list);
+        //moviesRecyclerView = findViewById(R.id.movies_list);
         categorySpinner = findViewById(R.id.category_spinner);
 
         moviesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
