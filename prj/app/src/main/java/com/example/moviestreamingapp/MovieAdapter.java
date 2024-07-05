@@ -3,6 +3,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,28 +24,29 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     @NonNull
     @Override
-    public MovieAdapter.MovieViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MovieViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.movie_item, parent, false);
-        return new MovieAdapter.MovieViewHolder(view);
+        return new MovieViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MovieAdapter.MovieViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
         holder.bind(movieList.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return movieList.size(); // Trả về số lượng phần tử trong movieList
+        return movieList != null ? movieList.size() : 0;
     }
 
-    public void updateList(ArrayList<Movie> newList) {
+    public void updateList(List<Movie> newList) {
         movieList = newList;
         notifyDataSetChanged();
     }
 
     public class MovieViewHolder extends RecyclerView.ViewHolder {
         private TextView movieTitle;
+        private ImageView movieImage;
 
         public MovieViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -53,6 +55,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         public void bind(Movie movie) {
             movieTitle.setText(movie.getTitle());
+
         }
     }
 }

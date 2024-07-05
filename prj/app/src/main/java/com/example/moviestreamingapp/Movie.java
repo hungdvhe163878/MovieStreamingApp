@@ -1,21 +1,25 @@
 package com.example.moviestreamingapp;
 
+import java.util.List;
+
 public class Movie {
+    private String movieId;
     private String title;
     private String category;
     private String release_date;
     private String trailer_url;
     private String description;
-    private String[] actors;
+    private List<String> actors;
     private int likes;
-    private String[] languages;
-    private String[] subtitles;
-    private String[] quality;
-
+    private List<String> languages;
+    private List<String> subtitles;
+    private List<String> quality;
+    private String imageUrl;
     public Movie() {
     }
 
-    public Movie(String title, String category, String release_date, String trailer_url, String description, String[] actors, int likes, String[] languages, String[] subtitles, String[] quality) {
+    public Movie(String movieId, String title, String category, String release_date, String trailer_url, String description, List<String> actors, int likes, List<String> languages, List<String> subtitles, List<String> quality, String imageUrl) {
+        this.movieId = movieId;
         this.title = title;
         this.category = category;
         this.release_date = release_date;
@@ -26,6 +30,23 @@ public class Movie {
         this.languages = languages;
         this.subtitles = subtitles;
         this.quality = quality;
+        this.imageUrl = imageUrl;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getMovieId() {
+        return movieId;
+    }
+
+    public void setMovieId(String movieId) {
+        this.movieId = movieId;
     }
 
     public String getTitle() {
@@ -68,11 +89,11 @@ public class Movie {
         this.description = description;
     }
 
-    public String[] getActors() {
+    public List<String> getActors() {
         return actors;
     }
 
-    public void setActors(String[] actors) {
+    public void setActors(List<String> actors) {
         this.actors = actors;
     }
 
@@ -84,27 +105,27 @@ public class Movie {
         this.likes = likes;
     }
 
-    public String[] getLanguages() {
+    public List<String> getLanguages() {
         return languages;
     }
 
-    public void setLanguages(String[] languages) {
+    public void setLanguages(List<String> languages) {
         this.languages = languages;
     }
 
-    public String[] getSubtitles() {
+    public List<String> getSubtitles() {
         return subtitles;
     }
 
-    public void setSubtitles(String[] subtitles) {
+    public void setSubtitles(List<String> subtitles) {
         this.subtitles = subtitles;
     }
 
-    public String[] getQuality() {
+    public List<String> getQuality() {
         return quality;
     }
 
-    public void setQuality(String[] quality) {
+    public void setQuality(List<String> quality) {
         this.quality = quality;
     }
 }

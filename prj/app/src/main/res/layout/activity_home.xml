@@ -23,6 +23,8 @@
             android:background="@color/white"
             android:drawablePadding="8dp"
             android:textColor="@android:color/black"/>
+
+        <!-- Category Spinner -->
         <Spinner
             android:id="@+id/category_spinner"
             android:layout_width="match_parent"
@@ -30,8 +32,10 @@
             android:layout_marginTop="8dp"
             android:padding="8dp"
             android:spinnerMode="dropdown"
-            android:textColor="@android:color/white" />
+            android:background="@color/white"
+            android:textColor="@android:color/black" />
     </LinearLayout>
+
     <!-- Slider -->
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/slider"
@@ -40,6 +44,7 @@
         android:layout_below="@id/navigation_bar"
         android:layout_marginTop="8dp"
         android:contentDescription="@string/slider_content_description" />
+
     <!-- Movies List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/movies_list"

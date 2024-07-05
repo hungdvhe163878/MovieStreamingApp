@@ -8,20 +8,25 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseException;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+
+
 
 public class HomeActivity extends AppCompatActivity {
     private static final String TAG = "HomeActivity";
@@ -29,9 +34,12 @@ public class HomeActivity extends AppCompatActivity {
     private RecyclerView moviesRecyclerView;
     private MovieAdapter movieAdapter;
     private List<Movie> movieList;
-    private FirebaseFirestore db;
+    private DatabaseReference moviesDb;
+    private DatabaseReference categoriesDb;
     private EditText searchEditText;
     private Spinner categorySpinner;
+    private ArrayAdapter<String> categoryAdapter;
+    private List<String> categoriesList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +55,14 @@ public class HomeActivity extends AppCompatActivity {
         movieAdapter = new MovieAdapter(this, movieList);
         moviesRecyclerView.setAdapter(movieAdapter);
 
-        db = FirebaseFirestore.getInstance();
+        moviesDb = FirebaseDatabase.getInstance().getReference("movies");
+        categoriesDb = FirebaseDatabase.getInstance().getReference("categories");
 
         setupSearchEditText();
         setupCategorySpinner();
 
         loadMovies();
+        loadCategories();
     }
 
     private void setupSearchEditText() {
@@ -71,7 +81,6 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        // Handle enter key press in searchEditText
         searchEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH || (event != null && event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
                 String query = searchEditText.getText().toString().trim();
@@ -83,10 +92,15 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setupCategorySpinner() {
+        categoriesList = new ArrayList<>();
+        categoryAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categoriesList);
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(categoryAdapter);
+
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedCategory = categorySpinner.getSelectedItem().toString();
+                String selectedCategory = categoryAdapter.getItem(position);
                 filterMoviesByCategory(selectedCategory);
             }
 
@@ -99,61 +113,111 @@ public class HomeActivity extends AppCompatActivity {
 
     private void loadMovies() {
         Log.d(TAG, "Loading movies...");
-        db.collection("movies").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
+        moviesDb.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 movieList.clear();
-                for (DocumentSnapshot document : task.getResult()) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     try {
-                        Movie movie = document.toObject(Movie.class);
-                        movieList.add(movie);
+                        Movie movie = dataSnapshot.getValue(Movie.class);
+                        if (movie != null) {
+                            movieList.add(movie);
+                        }
                     } catch (RuntimeException e) {
-                        Log.e(TAG, "Error deserializing movie: " + document.getId(), e);
+                        Log.e(TAG, "Error deserializing movie: " + dataSnapshot.getKey(), e);
                     }
                 }
                 runOnUiThread(() -> {
                     movieAdapter.notifyDataSetChanged();
                     Log.d(TAG, "Movies loaded successfully. Count: " + movieList.size());
                 });
-            } else {
-                Log.e(TAG, "Error getting documents: ", task.getException());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Error getting data: ", error.toException());
             }
         });
     }
 
     private void searchMovies(String query) {
-        db.collection("movies").whereEqualTo("title", query).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
+        Log.d(TAG, "Searching movies with query: " + query);
+        moviesDb.orderByChild("title").startAt(query).endAt(query + "\uf8ff").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 movieList.clear();
-                for (DocumentSnapshot document : task.getResult()) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     try {
-                        Movie movie = document.toObject(Movie.class);
-                        movieList.add(movie);
+                        Movie movie = dataSnapshot.getValue(Movie.class);
+                        if (movie != null) {
+                            movieList.add(movie);
+                        }
                     } catch (RuntimeException e) {
-                        Log.e(TAG, "Error deserializing movie: " + document.getId(), e);
+                        Log.e(TAG, "Error deserializing movie: " + dataSnapshot.getKey(), e);
                     }
                 }
+                Log.d(TAG, "Movies found: " + movieList.size());
                 movieAdapter.notifyDataSetChanged();
-            } else {
-                Log.e(TAG, "Error searching movies: ", task.getException());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Error searching movies: ", error.toException());
             }
         });
     }
 
     private void filterMoviesByCategory(String category) {
-        db.collection("movies").whereEqualTo("category", category).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
+        Log.d(TAG, "Filtering movies by category: " + category);
+        if (category.equals("All")) {
+            loadMovies();
+            return;
+        }
+
+        moviesDb.orderByChild("categories").equalTo(category).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 movieList.clear();
-                for (DocumentSnapshot document : task.getResult()) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     try {
-                        Movie movie = document.toObject(Movie.class);
-                        movieList.add(movie);
+                        Movie movie = dataSnapshot.getValue(Movie.class);
+                        if (movie != null) {
+                            movieList.add(movie);
+                        }
                     } catch (RuntimeException e) {
-                        Log.e(TAG, "Error deserializing movie: " + document.getId(), e);
+                        Log.e(TAG, "Error deserializing movie: " + dataSnapshot.getKey(), e);
                     }
                 }
+                Log.d(TAG, "Movies in filtered list: " + movieList.size());
                 movieAdapter.notifyDataSetChanged();
-            } else {
-                Log.e(TAG, "Error filtering movies: ", task.getException());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Error filtering movies: ", error.toException());
+            }
+        });
+    }
+
+    private void loadCategories() {
+        Log.d(TAG, "Loading categories...");
+        categoriesDb.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                categoriesList.clear();
+                categoriesList.add("All"); // Add default "All" category
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    String category = dataSnapshot.child("name").getValue(String.class);
+                    if (category != null) {
+                        categoriesList.add(category);
+                    }
+                }
+                categoryAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Error loading categories: ", error.toException());
             }
         });
     }

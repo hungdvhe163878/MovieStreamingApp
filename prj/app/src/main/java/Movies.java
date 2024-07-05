@@ -1,7 +1,7 @@
 public class Movies {
     private String title;
-    private String category;
-    private String release_date;
+    private String categories;
+    private String releaseDate;
     private String trailer_url;
     private String description;
     private String[] actors;
@@ -13,10 +13,10 @@ public class Movies {
     public Movies() {
     }
 
-    public Movies(String title, String category, String release_date, String trailer_url, String description, String[] actors, int likes, String[] languages, String[] subtitles, String[] quality) {
+    public Movies(String title, String categories, String releaseDate, String trailer_url, String description, String[] actors, int likes, String[] languages, String[] subtitles, String[] quality) {
         this.title = title;
-        this.category = category;
-        this.release_date = release_date;
+        this.categories = categories;
+        this.releaseDate = releaseDate;
         this.trailer_url = trailer_url;
         this.description = description;
         this.actors = actors;
@@ -35,19 +35,19 @@ public class Movies {
     }
 
     public String getCategory() {
-        return category;
+        return categories;
     }
 
     public void setCategory(String category) {
-        this.category = category;
+        this.categories = category;
     }
 
     public String getRelease_date() {
-        return release_date;
+        return releaseDate;
     }
 
     public void setRelease_date(String release_date) {
-        this.release_date = release_date;
+        this.releaseDate = release_date;
     }
 
     public String getTrailer_url() {
