@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/purple_700"
+    tools:context=".HomeActivity">
+    <!-- Navigation Bar -->
+    <LinearLayout
+        android:id="@+id/navigation_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/purple_700">
+
+        <!-- Search Box -->
+        <EditText
+            android:id="@+id/searchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search for movies..."
+            android:padding="8dp"
+            android:background="@color/white"
+            android:drawablePadding="8dp"
+            android:textColor="@android:color/black"/>
+
+        <!-- Category Spinner -->
+        <Spinner
+            android:id="@+id/category_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:padding="8dp"
+            android:spinnerMode="dropdown"
+            android:background="@color/white"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
+
+    <!-- Slider -->
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/slider"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/navigation_bar"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/slider_content_description" />
+
+    <!-- Movies List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/movies_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/slider"
+        android:layout_marginTop="8dp"
+        android:padding="8dp"
+        android:clipToPadding="false"/>
+</RelativeLayout>
