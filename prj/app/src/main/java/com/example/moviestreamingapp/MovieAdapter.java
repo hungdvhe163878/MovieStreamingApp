@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.moviestreamingapp.R;
 
 import java.util.ArrayList;
@@ -47,15 +48,23 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public class MovieViewHolder extends RecyclerView.ViewHolder {
         private TextView movieTitle;
         private ImageView movieImage;
+        private TextView movieReleaseDate;
 
         public MovieViewHolder(@NonNull View itemView) {
             super(itemView);
             movieTitle = itemView.findViewById(R.id.movie_title);
+            movieReleaseDate = itemView.findViewById(R.id.movie_release_date);
+            movieImage = itemView.findViewById(R.id.movie_image);
         }
 
         public void bind(Movie movie) {
             movieTitle.setText(movie.getTitle());
-
+            movieReleaseDate.setText(movie.getRelease_date());
+            if (movie.getImageUrl() != null && !movie.getImageUrl().isEmpty()) {
+                Glide.with(context).load(movie.getImageUrl()).into(movieImage);
+            } else {
+                movieImage.setImageResource(R.drawable.ic_launcher_background);
+            }
         }
     }
 }
